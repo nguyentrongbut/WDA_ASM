@@ -1,7 +1,30 @@
+using WDA_ASM.Models;
+using MongoDB.Driver;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+builder.WebHost.UseUrls($"http://localhost:{port}");
+
+var mongoSettings = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+
+if (mongoSettings == null || string.IsNullOrEmpty(mongoSettings.ConnectionString))
+{
+    Console.WriteLine("MongoDbSettings not configured!");
+}
+else
+{
+    try
+    {
+        var client = new MongoClient(mongoSettings.ConnectionString);
+        var database = client.GetDatabase(mongoSettings.DatabaseName);
+        Console.WriteLine($"Connected to MongoDB database: {mongoSettings.DatabaseName}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"MongoDB connection failed: {ex.Message}");
+    }
+}
 
 builder.Services.AddControllersWithViews();
 
@@ -18,6 +41,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 app.Run();
