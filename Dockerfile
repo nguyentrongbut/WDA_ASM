@@ -24,4 +24,4 @@ ENV ASPNETCORE_URLS=http://+:10000
 EXPOSE 10000
 
 # Entry point
-ENTRYPOINT ["dotnet", "WDA_Practical.dll"]
+ENTRYPOINT ["dotnet", "WDA_ASM.dll"]
